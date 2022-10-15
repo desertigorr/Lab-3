@@ -1,14 +1,29 @@
 # Программа универсальна и работает для любого варианта
 # Мой вариант - 5
 # Ожидаемый ввод: 2 4 10 y n
+user_input = input('Решение для задачи с рюкзаком на 7 ячеек (y/n): ')
+
+flag_7 = True
+match user_input:
+    case 'y':
+        BP_SIZE = 7
+        BP_W = 2
+        BP_L = 4
+    case _:
+        BP_SIZE = 'undefined'
+        flag_7 = False
 
 # Ввод исходных данных
-BP_W = int(input('Введите ширину рюкзака: '))
-BP_L = int(input('Введите длину рюкзака: '))
+if not flag_7:
+    BP_W = int(input('Введите ширину рюкзака: '))
+    BP_L = int(input('Введите длину рюкзака: '))
+
+
+    # Вычисление размера рюкзака (количества ячеек)
+    BP_SIZE = BP_W * BP_L
+
 s_points = int(input('Начальное кол-во очков: '))
 
-# Вычисление размера рюкзака (количества ячеек)
-BP_SIZE = BP_W * BP_L
 # Инициализация массива для вещей, которые Том возьмет с собой
 backpack = []
 
@@ -140,16 +155,27 @@ for i in item_sorted:
 
 # Берём все оставшиеся предметы, пока не закончится место в рюкзаке
 # Одновременно с этим добавляем Тому очки выживания
-while BP_SIZE > 0:
-    for i in range(item_sorted[0][2]):
-        backpack.append(item_sorted[0][1])
-    BP_SIZE -= item_sorted[0][2]
-    s_points += item_sorted[0][0] * item_sorted[0][2]
-    item_sorted.pop(0)
-    print(item_sorted)
+
+# Массив для предметов, которые не берём с собой
+item_out = []
+while True:
+    if len(item_sorted) <= 0:
+        break
+    if BP_SIZE - item_sorted[0][2] >= 0:
+        for i in range(item_sorted[0][2]):
+            backpack.append(item_sorted[0][1])
+        BP_SIZE -= item_sorted[0][2]
+        s_points += item_sorted[0][0] * item_sorted[0][2]
+        item_sorted.pop(0)
+    # Случай, когда места в рюкзаке не хватает для того, чтобы взять предмет
+    elif BP_SIZE - item_sorted[0][2] < 0:
+        item_out.append(item_sorted[0])
+        item_sorted.pop(0)
+        if len(item_sorted) == 0:
+            break
 
 # Вычитаем очки выживания за предметы, которые не удалось взять с собой
-for i in item_sorted:
+for i in item_out:
     s_points -= round(i[0] * i[2])
 
 # Создаем двумерный массив
@@ -161,7 +187,10 @@ for i in range(BP_W):
 item_count = 0
 for i in range(BP_W):
     for j in range(BP_L):
-        backpack_f[i][j] = backpack[item_count]
+        if len(backpack) > item_count:
+            backpack_f[i][j] = backpack[item_count]
+        else:
+            backpack_f[i][j] = ' '
         item_count += 1
 
 # Вывод итоговых данных
@@ -170,7 +199,12 @@ for i in backpack_f:
     print(i)
 
 print('Итоговое кол-во очков:')
-print(s_points)
+print(round(s_points))
+
+if s_points <= 0:
+    print('Том, вероятнее всего, не выживет')
+else:
+    print('Том способен выжить с таким инвентарём')
 
 
 
