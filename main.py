@@ -1,6 +1,6 @@
 # Программа универсальна и работает для любого варианта
-# Мой вариант - 5 (2x4, 10 очков, астма)
-
+# Мой вариант - 5
+# Ожидаемый ввод: 2 4 10 y n
 user_input = input('Решение для задачи с рюкзаком на 7 ячеек (y/n): ')
 
 flag_7 = True
@@ -158,6 +158,8 @@ for i in item_sorted:
 
 # Массив для предметов, которые не берём с собой
 item_out = []
+item_in = []
+
 while True:
     if len(item_sorted) <= 0:
         break
@@ -166,6 +168,7 @@ while True:
             backpack.append(item_sorted[0][1])
         BP_SIZE -= item_sorted[0][2]
         s_points += item_sorted[0][0] * item_sorted[0][2]
+        item_in.append(item_sorted[0])
         item_sorted.pop(0)
     # Случай, когда места в рюкзаке не хватает для того, чтобы взять предмет
     elif BP_SIZE - item_sorted[0][2] < 0:
@@ -205,6 +208,62 @@ if s_points <= 0:
     print('Том, вероятнее всего, не выживет')
 else:
     print('Том способен выжить с таким инвентарём')
+
+
+print('Ещё Том мог бы взять следующие наборы:')
+
+items = item_in.copy()
+items_out = item_out.copy()
+bp_slots = 8
+
+# Динамический алгоритм нахождения альтернативных вариантов
+
+for i in range(len(item_out)):
+    while True:
+        if len(items_out) > 0:
+            if (bp_slots - items[-1][2] + items_out[0][2] <= 8):
+                bp_slots = bp_slots - items[-1][2] + items_out[0][2]
+                s_points -= items[-1][0] * items[-1][2]
+                items[-1] = items_out[0]
+                s_points += items[-1][0] * items[-1][2]
+                if round(s_points) > 0:
+                    print("'и' ", end='')
+                    for i in items:
+                        print(f"'{i[1]}'", end=' ')
+                    print('Итого очков:', round(s_points))
+                items_out.pop(0)
+                if len(items_out) == 0:
+                    break
+            else:
+                items_out.pop(0)
+        else:
+            break
+
+    items = item_in.copy()
+    items_out = item_out.copy()
+
+    if (bp_slots - items[-2][2] + items_out[0][2] <= 8):
+        bp_slots -= items[-2][2]
+        s_points -= items[-2][0] * items[-2][2]
+        items[-2] = item_out[0]
+        bp_slots += items[-2][2]
+        s_points += items[-2][0] * items[-2][2]
+        if round(s_points) > 0:
+            for i in items:
+                print('и', end='')
+                print(i[1], end=' ')
+            print(round(s_points))
+
+
+
+
+
+
+
+
+
+
+
 
 
 
